@@ -1,7 +1,7 @@
 script_name('info sborka')
 script_author('evernos')
-script_version('0.1-beta')
-local ver = '0.1-beta'
+script_version('0.2-beta')
+local ver = '0.2-beta'
 local versb = '13.12.2024'
 
 local imgui = require('mimgui')
@@ -23,7 +23,7 @@ if enable_autoupdate then
         if autoupdate_loaded then
             Update.json_url = "https://raw.githubusercontent.com/evernos/update/refs/heads/main/update.json?" .. tostring(os.clock())
             Update.prefix = "[" .. string.upper(thisScript().name) .. "]: "
-            Update.url = "https://raw.githubusercontent.com/evernos/update/refs/heads/main/mimgui%20sborka.lua"
+            Update.url = "https://github.com/evernos/update/edit/main/mimgui%20sborka.lua"
         end
     end
 end

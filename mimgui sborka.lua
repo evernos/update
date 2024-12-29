@@ -34,7 +34,7 @@ function update()
             downloadUrlToFile(decodeJson(response.text)['url'], thisScript().path, function (id, status, p1, p2)
                 print(u8:decode'Скачиваю '..decodeJson(response.text)['url']..' в '..thisScript().path)
                 if status == dlstatus.STATUSEX_ENDDOWNLOAD then
-                    sampAddChatMessage(u8:decode'Скрипт обновлен, перезагрузка...', -1)
+                    print(u8:decode'Скрипт обновлен, перезагрузка...', -1)
                     thisScript():reload()
                 end
             end)
@@ -97,6 +97,19 @@ imgui.OnFrame(
             imgui.SameLine()
             imgui.TextWrapped('Ваша версия сборки - '..versb..'')
             imgui.TextWrapped('Версия скрипта - '..ver..'')
+            if imgui.Button('Перезагрузить скрипт') then
+                thisScript():reload()
+            end
+            imgui.SameLine()
+            if imgui.Button('Проверить наличие обновлений') then
+                print(u8:decode'[Сборка] Проверяем наличие обновлений..')
+                if thisScript().version ~= lastver then
+                    print(u8:decode'[Сборка] Найдено обновление скрипта. Пытаемся загрузить..')
+                    update():download()
+                else
+                    print(u8:decode'[Сборка] Обновлений не найдено')
+                end
+            end
         end
         if imgui.CollapsingHeader('История обновлений') then
             imgui.TextWrapped('Вся история обновлений (кроме двух первых версий :D)(дублирование дополнительно -> История обновлений.txt):')

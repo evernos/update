@@ -60,7 +60,7 @@ function main()
     print(u8:decode'[Сборка] Проверяем наличие обновлений..')
     local lastver = update():getLastVersion()
     if thisScript().version ~= lastver then
-        print(u8:decode'[Сборка] Найдено обновление скрипта. Пытаемся загрузить..')
+        print(u8:decode'[Сборка] Найдено обновление скрипта. Пытаемся загрузить.. ('..ver..' -> '..lastver..')')
         update():download()
     else
         print(u8:decode'[Сборка] Обновлений не найдено')

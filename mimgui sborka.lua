@@ -11,6 +11,7 @@ encoding.default = 'CP1251'
 local u8 = encoding.UTF8
 local fa = require('fAwesome6_solid')
 require('lib.moonloader')
+local memory = require('memory')
 
 writeMemory(0x571784, 4, 0x57C7FFF, false)
 writeMemory(0x57179C, 4, 0x57C7FFF, false) -- https://www.blast.hk/threads/13380/post-1069199 thnk
@@ -68,7 +69,14 @@ function main()
     sampRegisterChatCommand('is', function() window[0] = not window[0] end)
     sampRegisterChatCommand('case', case)
     sampRegisterChatCommand('cases', case)
+    sampRegisterChatCommand('cc', cchat)
     wait(0)
+end
+
+function cchat()
+    memory.fill(sampGetChatInfoPtr() + 306, 0x0, 25200)
+    memory.write(sampGetChatInfoPtr() + 306, 25562, 4, 0x0)
+    memory.write(sampGetChatInfoPtr() + 0x63DA, 1, 1)
 end
 
 function case()
@@ -108,6 +116,11 @@ imgui.OnFrame(
                     print(u8:decode'[Сборка] Обновлений не найдено')
                 end
             end
+            if imgui.Button('Очистить чат') then
+                cchat()
+            end
+            imgui.SameLine()
+            imgui.TextWrapped('ну или /cc в чат')
         end
         if imgui.CollapsingHeader('История обновлений') then
             imgui.TextWrapped('Вся история обновлений (кроме двух первых версий :D)(дублирование дополнительно -> История обновлений.txt):')

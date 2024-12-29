@@ -1,6 +1,6 @@
 script_name('mimgui sborka')
 script_author('evernos')
-script_version('0.2-beta')
+script_version('0.21-beta')
 local versb = '13.12.2024'
 local ver = thisScript().version
 

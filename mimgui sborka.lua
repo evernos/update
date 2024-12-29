@@ -39,7 +39,7 @@ function update()
                 end
             end)
         else
-            sampAddChatMessage(u8:decode'Ошибка, невозможно установить обновление, код: '..response.status_code, -1)
+            print(u8:decode'Ошибка, невозможно установить обновление, код: '..response.status_code)
         end
     end
     return f
@@ -57,19 +57,20 @@ function main()
 --[[    sampAddChatMessage('[Сборка] Автор сборки для Online RP - evernos', -1)
     sampAddChatMessage('[Сборка] Информация/помощь - /infosb', -1)
     sampAddChatMessage('[Сборка] Версия сборки - '..versb..', скрипта - '..thisScript().version..'', -1)]]
-    sampAddChatMessage(u8:decode'[Сборка] Проверяем наличие обновлений..', -1)
+    print(u8:decode'[Сборка] Проверяем наличие обновлений..')
     local lastver = update():getLastVersion()
     if thisScript().version ~= lastver then
-        sampAddChatMessage(u8:decode'[Сборка] Найдено обновление скрипта. Пытаемся загрузить..', -1)
+        print(u8:decode'[Сборка] Найдено обновление скрипта. Пытаемся загрузить..')
         update():download()
     else
-        sampAddChatMessage(u8:decode'[Сборка] Обновлений не найдено', -1)
+        print(u8:decode'[Сборка] Обновлений не найдено')
         sampAddChatMessage(u8:decode'[Сборка] Автор сборки для Online RP - evernos', -1)
         sampAddChatMessage(u8:decode'[Сборка] Информация/помощь - /is', -1)
     end
     sampRegisterChatCommand('is', function() window[0] = not window[0] end)
     sampRegisterChatCommand('case', case)
     sampRegisterChatCommand('cases', case)
+    wait(0)
 end
 
 function case()

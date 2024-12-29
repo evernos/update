@@ -57,7 +57,6 @@ function main()
 --[[    sampAddChatMessage('[Сборка] Автор сборки для Online RP - evernos', -1)
     sampAddChatMessage('[Сборка] Информация/помощь - /infosb', -1)
     sampAddChatMessage('[Сборка] Версия сборки - '..versb..', скрипта - '..thisScript().version..'', -1)]]
-    print(u8:decode'[Сборка] Проверяем наличие обновлений..')
     local lastver = update():getLastVersion()
     if thisScript().version ~= lastver then
         print(u8:decode'[Сборка] Найдено обновление скрипта. Пытаемся загрузить.. ('..ver..' -> '..lastver..')')

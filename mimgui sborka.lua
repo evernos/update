@@ -35,7 +35,6 @@ function update()
                 print(u8:decode'Скачиваю '..decodeJson(response.text)['url']..' в '..thisScript().path)
                 if status == dlstatus.STATUSEX_ENDDOWNLOAD then
                     print(u8:decode'Скрипт обновлен, перезагрузка...', -1)
-                    thisScript():reload()
                 end
             end)
         else

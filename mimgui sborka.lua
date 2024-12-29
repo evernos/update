@@ -64,9 +64,9 @@ function main()
         update():download()
     else
         print(u8:decode'[Сборка] Обновлений не найдено')
+        sampAddChatMessage(u8:decode'[Сборка] Автор сборки для Online RP - evernos', -1)
+        sampAddChatMessage(u8:decode'[Сборка] Информация/помощь - /is', -1)
     end
-    sampAddChatMessage(u8:decode'[Сборка] Автор сборки для Online RP - evernos', -1)
-    sampAddChatMessage(u8:decode'[Сборка] Информация/помощь - /is', -1)
     sampRegisterChatCommand('is', function() window[0] = not window[0] end)
     sampRegisterChatCommand('case', case)
     sampRegisterChatCommand('cases', case)

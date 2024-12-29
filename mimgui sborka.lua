@@ -70,10 +70,6 @@ function main()
     sampRegisterChatCommand('is', function() window[0] = not window[0] end)
     sampRegisterChatCommand('case', case)
     sampRegisterChatCommand('cases', case)
-
-    repeat wait(0) until sampIsLocalPlayerSpawned()
-    sampAddChatMessage(u8:decode'[Сборка] Успешно загрузились. Приятной игры', -1)
-    wait(0)
 end
 
 function case()

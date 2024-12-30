@@ -106,16 +106,6 @@ imgui.OnFrame(
             if imgui.Button('Перезагрузить скрипт') then
                 thisScript():reload()
             end
-            imgui.SameLine()
-            if imgui.Button('Проверить наличие обновлений') then
-                print(u8:decode'[Сборка] Проверяем наличие обновлений..')
-                if thisScript().version ~= lastver then
-                    print(u8:decode'[Сборка] Найдено обновление скрипта. Пытаемся загрузить..')
-                    update():download()
-                else
-                    print(u8:decode'[Сборка] Обновлений не найдено')
-                end
-            end
             if imgui.Button('Очистить чат') then
                 cchat()
             end

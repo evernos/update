@@ -204,16 +204,18 @@ imgui.OnFrame(
                 inicfg.save(ini, fini)
             end
             if imgui.ToggleButton('Автообновление скрипта', au1) then
-                if imgui.ToggleButton('Информирование в лог (moonloader.log / консоль SAMPFUNCS)', auc1) then
-                    ini.main.auc = not ini.main.auc
+                if ini.main.au then
+                    if imgui.ToggleButton('Информирование в лог (moonloader.log / консоль SAMPFUNCS)', auc1) then
+                        ini.main.auc = not ini.main.auc
+                        inicfg.save(ini, fini)
+                    end
+                    if imgui.ToggleButton('Информирование в чат', aucc1) then
+                        ini.main.aucc = not ini.main.aucc
+                        inicfg.save(ini, fini)
+                    end
+                    ini.main.au = not ini.main.au
                     inicfg.save(ini, fini)
                 end
-                if imgui.ToggleButton('Информирование в чат', aucc1) then
-                    ini.main.aucc = not ini.main.aucc
-                    inicfg.save(ini, fini)
-                end
-                ini.main.au = not ini.main.au
-                inicfg.save(ini, fini)
             end
         end
         if imgui.CollapsingHeader('Реконнект') then

@@ -142,7 +142,7 @@ function main()
                 if ini.main.auc then
                     print(u8:decode'[Сборка] Обновлений не найдено')
                 end
-                if ini.main aucc then
+                if ini.main.aucc then
                     sampAddChatMessage(u8:decode'[Сборка] Обновлений не найдено', -1)
                 end
             end

@@ -12,6 +12,18 @@ local u8 = encoding.UTF8
 local fa = require('fAwesome6_solid')
 require('lib.moonloader')
 local memory = require('memory')
+local inicfg = require('inicfg')
+
+local fini = 'settings_mimgui_sborka.ini'
+local ini = inicfg.load({
+    main = {
+        si = true,
+        au = true,
+        auc = true,
+        aucc = false
+    }
+}, fini)
+inicfg.save(ini, fini)
 
 writeMemory(0x571784, 4, 0x57C7FFF, false)
 writeMemory(0x57179C, 4, 0x57C7FFF, false) -- https://www.blast.hk/threads/13380/post-1069199 thnk
@@ -33,19 +45,77 @@ function update()
         local response = requests.get(raw)
         if response.status_code == 200 then
             downloadUrlToFile(decodeJson(response.text)['url'], thisScript().path, function (id, status, p1, p2)
-                print(u8:decode'Скачиваю '..decodeJson(response.text)['url']..' в '..thisScript().path)
+                if ini.main.auc then
+                    print(u8:decode'Скачиваю '..decodeJson(response.text)['url']..' в '..thisScript().path)
+                end
                 if status == dlstatus.STATUSEX_ENDDOWNLOAD then
-                    print(u8:decode'Скрипт обновлен, перезагрузка...', -1)
+                    if ini.main.auc then
+                        print(u8:decode'Скрипт обновлен, перезагрузка...')
+                    end
+                    if ini.main.aucc then
+                        sampAddChatMessage(u8:decode'Скрипт обновлен, перезагрузка...', -1)
+                    end
                 end
             end)
         else
-            print(u8:decode'Ошибка, невозможно установить обновление, код: '..response.status_code)
+            if ini.main.auc then
+                print(u8:decode'Ошибка, невозможно установить обновление, код: '..response.status_code)
+            end
+            if ini.main.aucc then
+                sampAddChatMessage(u8:decode'Ошибка, невозможно установить обновление, код: '..response.status_code, -1)
+            end
         end
     end
     return f
 end
 
+function imgui.ToggleButton(str_id, bool)
+    local rBool = false
+    if LastActiveTime == nil then
+        LastActiveTime = {}
+    end
+    if LastActive == nil then
+        LastActive = {}
+    end
+    local function ImSaturate(f)
+        return f < 0.0 and 0.0 or (f > 1.0 and 1.0 or f)
+    end
+    local p = imgui.GetCursorScreenPos()
+    local dl = imgui.GetWindowDrawList()
+    local height = imgui.GetTextLineHeightWithSpacing()
+    local width = height * 1.70
+    local radius = height * 0.50
+    local ANIM_SPEED = type == 2 and 0.10 or 0.15
+    local butPos = imgui.GetCursorPos()
+    if imgui.InvisibleButton(str_id, imgui.ImVec2(width, height)) then
+        bool[0] = not bool[0]
+        rBool = true
+        LastActiveTime[tostring(str_id)] = os.clock()
+        LastActive[tostring(str_id)] = true
+    end
+    imgui.SetCursorPos(imgui.ImVec2(butPos.x + width + 8, butPos.y + 2.5))
+    imgui.Text( str_id:gsub('##.+', '') )
+    local t = bool[0] and 1.0 or 0.0
+    if LastActive[tostring(str_id)] then
+        local time = os.clock() - LastActiveTime[tostring(str_id)]
+        if time <= ANIM_SPEED then
+            local t_anim = ImSaturate(time / ANIM_SPEED)
+            t = bool[0] and t_anim or 1.0 - t_anim
+        else
+            LastActive[tostring(str_id)] = false
+        end
+    end
+    local col_circle = bool[0] and imgui.ColorConvertFloat4ToU32(imgui.ImVec4(imgui.GetStyle().Colors[imgui.Col.ButtonActive])) or imgui.ColorConvertFloat4ToU32(imgui.ImVec4(imgui.GetStyle().Colors[imgui.Col.TextDisabled]))
+    dl:AddRectFilled(p, imgui.ImVec2(p.x + width, p.y + height), imgui.ColorConvertFloat4ToU32(imgui.GetStyle().Colors[imgui.Col.FrameBg]), height * 0.5)
+    dl:AddCircleFilled(imgui.ImVec2(p.x + radius + t * (width - radius * 2.0), p.y + radius), radius - 1.5, col_circle)
+    return rBool
+end
+
 local window = imgui.new.bool()
+local si1 = imgui.new.bool(ini.main.si)
+local au1 = imgui.new.bool(ini.main.au)
+local auc1 = imgui.new.bool(ini.main.auc)
+local aucc1 = imgui.new.bool(ini.main.aucc)
 
 imgui.OnInitialize(function()
     imgui.GetIO().IniFilename = nil
@@ -58,11 +128,27 @@ function main()
     sampAddChatMessage('[Сборка] Информация/помощь - /infosb', -1)
     sampAddChatMessage('[Сборка] Версия сборки - '..versb..', скрипта - '..thisScript().version..'', -1)]]
     local lastver = update():getLastVersion()
-    if thisScript().version ~= lastver then
-        print(u8:decode'[Сборка] Найдено обновление скрипта. Пытаемся загрузить.. ('..ver..' -> '..lastver..')')
-        update():download()
-    else
-        print(u8:decode'[Сборка] Обновлений не найдено')
+    if ini.main.au then
+        if ini.main.au and ini.main.auc then
+            if thisScript().version ~= lastver then
+                if ini.main.auc then
+                    print(u8:decode'[Сборка] Найдено обновление скрипта. Пытаемся загрузить.. ('..ver..' -> '..lastver..')')
+                end
+                if ini.main.aucc then
+                    sampAddChatMessage(u8:decode'[Сборка] Найдено обновление скрипта. Пытаемся загрузить.. ('..ver..' -> '..lastver..')', -1)
+                end
+                update():download()
+            else
+                if ini.main.auc then
+                    print(u8:decode'[Сборка] Обновлений не найдено')
+                end
+                if ini.main aucc then
+                    sampAddChatMessage(u8:decode'[Сборка] Обновлений не найдено', -1)
+                end
+            end
+        end
+    end
+    if ini.main.si then
         sampAddChatMessage(u8:decode'[Сборка] Автор сборки для Online RP - evernos', -1)
         sampAddChatMessage(u8:decode'[Сборка] Информация/помощь - /is', -1)
     end
@@ -112,41 +198,23 @@ imgui.OnFrame(
             imgui.SameLine()
             imgui.TextWrapped('ну или /cc в чат')
         end
-        if imgui.CollapsingHeader('История обновлений') then
-            imgui.TextWrapped('Вся история обновлений (кроме двух первых версий :D)(дублирование дополнительно -> История обновлений.txt):')
-            if imgui.CollapsingHeader('04.09.2024') then
-                imgui.TextWrapped('Обновление с выходом оффициального обновления сборки 03.09.2024')
-                imgui.TextWrapped('Убраны лишние модификации в модлоадере (по факту - все), лишние файлы в сборке')
-                imgui.TextWrapped('Теперь будут только ссылки на модификации в папке "дополнительно", дабы уменьшить размер сборки')
-                imgui.TextWrapped('Добавлен мод на первое лицо')
-                imgui.TextWrapped('Убраны два камхака, теперь скачать можно ОДИН, ссылка на него в .txtшнике "Другие модификации"')
-                imgui.TextWrapped('Замены различных картинок, по типу fist/sampgui/mouse и т.п заменяются теперь как обычно, не через модлоадер, но по желанию заменяйте как хотите :D')
-                imgui.TextWrapped('p.s клео и модлоадер добавлены добавлены в оффициальную сборку, так что их устанавливал не я')
+        if imgui.CollapsingHeader('Настройки скрипта') then
+            if imgui.ToggleButton('Приветственное сообщение при входе в игру', si1) then
+                ini.main.si = not ini.main.si
+                inicfg.save(ini, fini)
             end
-            if imgui.CollapsingHeader('05.11.2024') then
-                imgui.TextWrapped('Обновление с выходом оффициального обновления сборки 04.11.2024')
-                imgui.TextWrapped("Добавлены HD иконки всего оружия (были в самых ранних версиях сборки, только они лежали в modloader'е, а не в gta3.img)")
-                imgui.TextWrapped('Добавлен MapFix.asi, т.к. я его забыл добавить в обновлении 04.09.2024 (точнее перенести с более ранней сборки)')
-                imgui.TextWrapped('Добавлена возможность видеть все деньги, если у вас их больше 100кк')
-                imgui.TextWrapped('Добавлен sf_r3_opcodes_fix.lua (фикс 3-х опкодов сампфункса)')
-                imgui.TextWrapped("Убран автотег (/tagmenu), его опять же можно найти в .txt'шнике")
-                imgui.SameLine()
-                imgui.TextWrapped('"Другие')
-                imgui.SameLine()
-                imgui.TextWrapped('модификации"')
+            if imgui.ToggleButton('Автообновление скрипта', au1) then
+                if imgui.ToggleButton('Информирование в лог (moonloader.log / консоль SAMPFUNCS)', auc1) then
+                    ini.main.auc = not ini.main.auc
+                    inicfg.save(ini, fini)
+                end
+                if imgui.ToggleButton('Информирование в чат', aucc1) then
+                    ini.main.aucc = not ini.main.aucc
+                    inicfg.save(ini, fini)
+                end
+                ini.main.au = not ini.main.au
+                inicfg.save(ini, fini)
             end
-            if imgui.CollapsingHeader('10.11.2024') then
-                imgui.TextWrapped('Фикс крашей и распаковки архива')
-            end
-            if imgui.CollapsingHeader('13.12.2024') then
-                imgui.TextWrapped('Обновление с выходом оффициального обновления сборки 02.12.2024')
-                imgui.TextWrapped('Фиксанут скрипт Input Helper, теперь при вводе в консоль сампфункса команд, где нужно нажать букву T, не будет открываться чат ( просто в 41 строке добавил "and not isSampfuncsConsoleActive()" )')
-                imgui.TextWrapped('Перенесен скрипт на отображение денег в мой скрипт (короче, удален 100kk+.lua, но его строки лежат в mimgui sborka.lua)')
-                imgui.TextWrapped('Касаемо моего скрипта - проще говоря, дубликат папки дополнительно, но имеет расширенный функционал (в будущем запихну автообнову, сейчас опыта мало)(возможен говнокод)')
-            end
-        end
-        if imgui.CollapsingHeader('Другие модификации') then
-            imgui.TextWrapped('Читать в дополнительно -> Другие модификации.txt')
         end
         if imgui.CollapsingHeader('Реконнект') then
             imgui.TextWrapped('Клео скрипт, реконнект v6 от AIR')

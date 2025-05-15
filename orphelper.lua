@@ -1,6 +1,6 @@
 script_name('ONLINE RP HELPER')
 script_author('evernos')
-script_version('0.21-beta')
+script_version('0.21.1-beta')
 local ver = thisScript().version
 
 local imgui = require('mimgui')
@@ -56,13 +56,16 @@ function update()
 end
 
 local window = imgui.new.bool()
-local wsettings = imgui.new.bool()
-local si1 = imgui.new.bool(ini.main.si)
+local settings = imgui.new.bool()
+local prochee = imgui.new.bool()
+local si = imgui.new.bool(ini.main.si)
 
 imgui.OnInitialize(function()
     imgui.GetIO().IniFilename = nil
     fa.Init()
 end)
+
+local buttonwindow = imgui.ImVec2(-1, 0)
 
 function main()
     repeat wait(0) until isSampAvailable()
@@ -72,15 +75,19 @@ function main()
         update():download()
     else
         print(u8:decode'[Сборка] Обновлений не найдено')
+        sampAddChatMessage(u8:decode'[ORP HELPER] {ffffff}Загрузились. Автор - evernos', 0x0055ffff)
+        sampAddChatMessage(u8:decode'[ORP HELPER] {ffffff}Настройки скрипта - /oh', 0x0055ffff)
+        sampAddChatMessage(u8:decode'[orp helper] не вижу смысл использовать скрипт, после обновы будет уже что-то', -1)
     end
-    sampAddChatMessage(u8:decode'[ORP HELPER] {ffffff}Загрузились. Автор - evernos', 0x0055ffff)
-    sampAddChatMessage(u8:decode'[ORP HELPER] {ffffff}Настройки скрипта - /oh', 0x0055ffff)
-    sampAddChatMessage(u8:decode'[orp helper] не вижу смысл использовать скрипт, после обновы будет уже что-то', -1)
     sampRegisterChatCommand('oh', function() window[0] = not window[0] end)
     sampRegisterChatCommand('case', case)
     sampRegisterChatCommand('cases', case)
     sampRegisterChatCommand('cc', cchat)
     wait(0)
+end
+
+function case()
+    sampAddChatMessage(u8:decode'[ORP HELPER] {ffffff}Такая команда доступна только для игроков с телефона!', 0x0055ffff)
 end
 
 function cchat()
@@ -89,33 +96,44 @@ function cchat()
     memory.write(sampGetChatInfoPtr() + 0x63DA, 1, 1)
 end
 
-function case()
-    sampAddChatMessage(u8:decode'[ORP HELPER] {ffffff}Такая команда доступна только для игроков с телефона!', 0x0055ffff)
-end
-
 imgui.OnFrame(
     function() return window[0] end,
     function(this)
         local size, res = imgui.ImVec2(500, 500), imgui.ImVec2(getScreenResolution())
         imgui.SetNextWindowSize(size, imgui.Cond.FirstUseEver)
         imgui.SetNextWindowPos(imgui.ImVec2(res.x / 2, res.y / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
-        imgui.Begin('Online RolePlay Helper / Автор evernos / Версия '..ver, window, nil)
+        imgui.Begin('Online RolePlay Helper / Автор evernos / Версия '..ver, window, imgui.WindowFlags.NoResize)
         if imgui.Button('Настройки скрипта') then
-            wsettings[0] = not wsettings[0]
-            -- if not ini.main.fraction then
-            --     if imgui.CollapsingHeader('Выбери группу фракций') then
-            --         if imgui.Button('ПД/ФБР') then
-            --             ini.main.fraction = 'mj'
-            --             inicfg.save(ini, fini)
-            --         end
-            --     end
-            -- end
+            settings[0] = not settings[0]
+        end
+        if imgui.CollapsingHeader('Биндер') then
+            
+        end
+        if imgui.CollapsingHeader('Командный биндер') then
+            
+        end
+        if imgui.CollapsingHeader('Команды скрипта') then
+            if imgui.CollapsingHeader('/oh') then
+                imgui.Text('Описание: открытие меню скрипта')
+                imgui.Text('Использование: /oh')
+            end
+            if imgui.CollapsingHeader('/cc') then
+                imgui.Text('Описание: чистка чата')
+                imgui.Text('Использование: /cc')
+            end
+            if imgui.CollapsingHeader('/') then
+                imgui.Text('Описание: ')
+                imgui.Text('Использование: /')
+            end
+        end
+        if imgui.Button('Прочее', buttonwindow) then
+            prochee[0] = not prochee[0]
         end
         if imgui.CollapsingHeader('Действия со скриптом') then
-            if imgui.Button('Выключить скрипт') then
+            if imgui.Button('Выключить скрипт', buttonwindow) then
                 thisScript():unload()
             end
-            if imgui.Button('Перезагрузить скрипт') then
+            if imgui.Button('Перезагрузить скрипт', buttonwindow) then
                 thisScript():reload()
             end
         end
@@ -123,9 +141,38 @@ imgui.OnFrame(
     end
 )
 
+imgui.OnFrame(
+    function() return settings[0] end,
+    function (ssetings)
+        local ssize, sres = imgui.ImVec2(400, 400), imgui.ImVec2(getScreenResolution())
+        imgui.SetNextWindowSize(ssize, imgui.Cond.FirstUseEver)
+        imgui.SetNextWindowPos(imgui.ImVec2(sres.x / 2, sres.y / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
+        imgui.Begin('Online RolePlay Helper / Настройки', settings, imgui.WindowFlags.NoResize)
+    end
+)
+
+imgui.OnFrame(
+    function() return prochee[0] end,
+    function (piperochee)
+        local psize, pres = imgui.ImVec2(400, 400), imgui.ImVec2(getScreenResolution())
+        imgui.SetNextWindowSize(psize, imgui.Cond.FirstUseEver)
+        imgui.SetNextWindowPos(imgui.ImVec2(pres.x / 2, pres.y / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
+        imgui.Begin('Online RolePlay Helper / Прочее', prochee, imgui.WindowFlags.NoResize)
+        if imgui.Button('Скопировать в буфер обмена ссылку на ТГК', buttonwindow) then
+            setClipboardText('https://t.me/orphelper')
+        end
+    end
+)
+
 function onWindowMessage(m, p) -- https://www.blast.hk/threads/62755/post-553121 thnk
     if p == 0x1B and window[0] then
         consumeWindowMessage()
         window[0] = false
+    end
+end
+function onWindowMessage(m2, p2) -- https://www.blast.hk/threads/62755/post-553121 thnk
+    if p2 == 0x1B and settings[0] then
+        consumeWindowMessage()
+        settings[0] = false
     end
 end

@@ -1,6 +1,6 @@
 script_name('ONLINE RP HELPER')
 script_author('evernos')
-script_version('0.21.1-beta')
+script_version('0.21.2-beta')
 local ver = thisScript().version
 
 local imgui = require('mimgui')
@@ -13,12 +13,15 @@ require('lib.moonloader')
 local memory = require('memory')
 local inicfg = require('inicfg')
 local addons = require('ADDONS')
+local ev = require('lib.samp.events')
 
 local fini = 'settings_orphelper.ini'
 local ini = inicfg.load({
     main = {
         si = true,
-        fraction = false
+        fraction = false,
+        alogin = false,
+        passwordalogin = false
     }
 }, fini)
 inicfg.save(ini, fini)
@@ -59,6 +62,8 @@ local window = imgui.new.bool()
 local settings = imgui.new.bool()
 local prochee = imgui.new.bool()
 local si = imgui.new.bool(ini.main.si)
+local alogin = imgui.new.bool(ini.main.alogin)
+local passwordalogin = imgui.new.char[128](ini.main.passwordalogin)
 
 imgui.OnInitialize(function()
     imgui.GetIO().IniFilename = nil
@@ -103,7 +108,7 @@ imgui.OnFrame(
         imgui.SetNextWindowSize(size, imgui.Cond.FirstUseEver)
         imgui.SetNextWindowPos(imgui.ImVec2(res.x / 2, res.y / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
         imgui.Begin('Online RolePlay Helper / Автор evernos / Версия '..ver, window, imgui.WindowFlags.NoResize)
-        if imgui.Button('Настройки скрипта') then
+        if imgui.Button('Настройки скрипта', buttonwindow) then
             settings[0] = not settings[0]
         end
         if imgui.CollapsingHeader('Биндер') then
@@ -148,8 +153,35 @@ imgui.OnFrame(
         imgui.SetNextWindowSize(ssize, imgui.Cond.FirstUseEver)
         imgui.SetNextWindowPos(imgui.ImVec2(sres.x / 2, sres.y / 2), imgui.Cond.FirstUseEver, imgui.ImVec2(0.5, 0.5))
         imgui.Begin('Online RolePlay Helper / Настройки', settings, imgui.WindowFlags.NoResize)
+        if addons.ToggleButton('Автологин', alogin) then
+            ini.main.alogin = not ini.main.alogin
+            inicfg.save(ini, fini)
+        end
+        if ini.main.alogin then
+            imgui.InputTextWithHint('', 'Введите пароль', passwordalogin, 128, imgui.InputTextFlags.Password)
+            imgui.SameLine()
+            if imgui.Button('Сохранить пароль') then
+                text = u8:decode(ffi.string(passwordalogin))
+                ini.main.passwordalogin = text
+                inicfg.save(ini, fini)
+            end
+            if imgui.Button('Проверить пароль', buttonwindow) then
+                sampAddChatMessage(u8:decode'[ORP HELPER] {ffffff}Пароль: ' .. u8:decode(ffi.string(passwordalogin)), 0x0055ffff)
+            end
+        end
     end
 )
+
+if ini.main.alogin then
+    function ev.onShowDialog(dialogid, style, title, button1, button2, text1)
+        if string.find(title, title) then
+            if dialogid == 32700 then
+                sampSendDialogResponse(32700, 1, _, ini.main.passwordalogin)
+                return false
+            end
+        end
+    end
+end
 
 imgui.OnFrame(
     function() return prochee[0] end,

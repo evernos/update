@@ -1,6 +1,6 @@
 script_name('ONLINE RP HELPER')
 script_author('evernos')
-script_version('0.21.2-beta')
+script_version('0.21.3-beta')
 local ver = thisScript().version
 
 local imgui = require('mimgui')
@@ -85,14 +85,8 @@ function main()
         sampAddChatMessage(u8:decode'[orp helper] не вижу смысл использовать скрипт, после обновы будет уже что-то', -1)
     end
     sampRegisterChatCommand('oh', function() window[0] = not window[0] end)
-    sampRegisterChatCommand('case', case)
-    sampRegisterChatCommand('cases', case)
     sampRegisterChatCommand('cc', cchat)
     wait(0)
-end
-
-function case()
-    sampAddChatMessage(u8:decode'[ORP HELPER] {ffffff}Такая команда доступна только для игроков с телефона!', 0x0055ffff)
 end
 
 function cchat()
@@ -208,3 +202,4 @@ function onWindowMessage(m2, p2) -- https://www.blast.hk/threads/62755/post-5531
         settings[0] = false
     end
 end
+
